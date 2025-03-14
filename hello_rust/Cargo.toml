@@ -1,0 +1,10 @@
+[package]
+name = "hello_rust"
+version = "0.1.0"
+edition = "2024"
+authors = [
+    "AWTK Develop Team",
+    "Shen ZhaoKun <shenzhaokun@zlg.cn>",
+]
+
+[dependencies]

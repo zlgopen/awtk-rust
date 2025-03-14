@@ -1,0 +1,13 @@
+[package]
+name = "awtk_rust_gen"
+version = "0.1.0"
+edition = "2024"
+authors = [
+    "AWTK Develop Team",
+    "Shen ZhaoKun <shenzhaokun@zlg.cn>",
+]
+
+[dependencies]
+bindgen = "0.71.1"
+json = "0.12.4"
+pyo3 = { version = "0.23.5", features = ["auto-initialize"] }  # 启用自动初始化

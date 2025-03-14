@@ -1,0 +1,5 @@
+/.vscode
+/res
+/target
+/libs
+/src/awtk.rs

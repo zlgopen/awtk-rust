@@ -1,0 +1,9 @@
+<window name="home_page" theme="uiex">
+  <view name="view" x="c" y="25%" w="229" h="100">
+    <image name="image" x="c" y="0" w="229" h="54" draw_type="default" image="uiex_big_logo"/>
+    <view name="subview" x="c" y="b" w="100%" h="28" children_layout="default(r=1,c=0)">
+      <edit min="0" max="1024" step="1" name="edit" w="-28" tips="Hello, Rust!" auto_fix="true"/>
+      <button name="button" w="28" style="search"/>
+    </view>
+  </view>
+</window>

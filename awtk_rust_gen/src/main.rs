@@ -1,0 +1,31 @@
+﻿use awtk_rust_gen::{args::Args, builder::Builder, idl::Idl};
+use std::{fs, process};
+
+fn main() {
+    let args = Args::parser().unwrap_or_else(|err| {
+        println!("Problem parsing arguments: {err}!");
+        println!("{}", Args::help());
+        process::exit(1);
+    });
+
+    let idl_json = fs::read_to_string(&args.idl_path).unwrap_or_else(|err| {
+        println!("Problem reading idl file\"{}\":{err}", args.idl_path);
+        process::exit(2);
+    });
+
+    let idl = Idl::parser(&idl_json).unwrap_or_else(|err| {
+        println!("Problem parsing idl: {err}!");
+        process::exit(3);
+    });
+
+    Builder::build(&args, &idl).unwrap_or_else(|err| {
+        println!("Problem building: {err}!");
+        process::exit(4);
+    });
+
+    println!(
+        "{} : Generate \"{}\" success!",
+        env!("CARGO_PKG_NAME"),
+        args.out_path
+    );
+}
