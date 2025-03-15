@@ -28,4 +28,7 @@ for lib in "${libs[@]}" ; do
     fi
 done
 
+# 需要调试 awtk_rust_gen 的时候开启
+#export RUST_BACKTRACE=1
+
 cd "$awtk_rust_gen_dir" && cargo run -- -h "$source_dir/src/awtk.h" -i "$source_dir/tools/idl_gen/idl.json" -p "$source_dir/awtk_config.py" -o "$sh_dir/src/awtk.rs" && cd -

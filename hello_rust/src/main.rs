@@ -17,7 +17,7 @@ fn main() {
         tk_init(
             w,
             h,
-            app_type_t::APP_SIMULATOR,
+            AppType::Simulator,
             helper::c_ptr(env!("CARGO_PKG_NAME")),
             null() as _,
         );
