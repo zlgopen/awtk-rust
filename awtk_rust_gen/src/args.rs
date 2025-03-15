@@ -1,4 +1,4 @@
-﻿use std::{env, error::Error};
+﻿use std::{env, error::Error, path};
 
 #[derive(Default)]
 pub struct Args {
@@ -15,23 +15,27 @@ impl Args {
         }
     }
 
-    pub fn parser() -> Result<Args, Box<dyn Error>> {
+    pub fn parse() -> Result<Args, Box<dyn Error>> {
         let mut args = env::args();
         let mut result: Args = Args::new();
 
         while let Some(arg) = args.next() {
             match arg.as_str() {
                 "-h" | "--header" => {
-                    result.header_path = args.next().unwrap();
+                    let path = args.next().unwrap();
+                    result.header_path = path::absolute(path)?.to_str().unwrap().into();
                 }
                 "-i" | "--idl" => {
-                    result.idl_path = args.next().unwrap();
+                    let path = args.next().unwrap();
+                    result.idl_path = path::absolute(path)?.to_str().unwrap().into();
                 }
                 "-p" | "--py" => {
-                    result.py_config_path = args.next().unwrap();
+                    let path = args.next().unwrap();
+                    result.py_config_path = path::absolute(path)?.to_str().unwrap().into();
                 }
                 "-o" | "--out" => {
-                    result.out_path = args.next().unwrap();
+                    let path = args.next().unwrap();
+                    result.out_path = path::absolute(path)?.to_str().unwrap().into();
                 }
                 _ => continue,
             }

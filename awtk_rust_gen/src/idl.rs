@@ -13,7 +13,7 @@ impl Idl {
         }
     }
 
-    pub fn parser(idl: &str) -> Result<Idl, Box<dyn Error>> {
+    pub fn parse(idl: &str) -> Result<Idl, Box<dyn Error>> {
         let mut result: Idl = Idl::new();
         let parsed = json::parse(idl)?;
 

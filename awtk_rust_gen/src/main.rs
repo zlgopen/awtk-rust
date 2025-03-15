@@ -2,7 +2,7 @@
 use std::{fs, process};
 
 fn main() {
-    let args = Args::parser().unwrap_or_else(|err| {
+    let args = Args::parse().unwrap_or_else(|err| {
         println!("Problem parsing arguments: {err}!");
         println!("{}", Args::help());
         process::exit(1);
@@ -13,7 +13,7 @@ fn main() {
         process::exit(2);
     });
 
-    let idl = Idl::parser(&idl_json).unwrap_or_else(|err| {
+    let idl = Idl::parse(&idl_json).unwrap_or_else(|err| {
         println!("Problem parsing idl: {err}!");
         process::exit(3);
     });
