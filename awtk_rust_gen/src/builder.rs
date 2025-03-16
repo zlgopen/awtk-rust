@@ -156,7 +156,7 @@ impl Builder {
     }
 
     pub fn build(args: &Args, idl: &Idl) -> Result<(), Box<dyn Error>> {
-        let mut b: Builder = Builder::new();
+        let mut b = Builder::new();
 
         b.builder = idl
             .classes

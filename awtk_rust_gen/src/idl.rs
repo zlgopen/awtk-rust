@@ -60,7 +60,7 @@ impl Idl {
     }
 
     pub fn parse(idl: &str) -> Result<Self, Box<dyn Error>> {
-        let mut result: Idl = Idl::new();
+        let mut result = Idl::new();
         let items: Vec<serde_json::Value> = serde_json::from_str(idl)?;
 
         for item in items {
