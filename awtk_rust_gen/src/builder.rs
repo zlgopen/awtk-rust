@@ -163,6 +163,10 @@ impl Builder {
                 })
             });
 
+        b.builder = idl.enums.iter().fold(b.builder, |bld, (enum_name, _enum)| {
+            bld.allowlist_type(enum_name)
+        });
+
         b.builder
             /* 添加命名转换回调 */
             .parse_callbacks(Box::new(BuilderParseConverter { idl: idl.clone() }))
