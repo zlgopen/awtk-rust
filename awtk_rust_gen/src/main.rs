@@ -4,7 +4,6 @@ use std::{fs, process};
 fn main() {
     let args = Args::parse().unwrap_or_else(|err| {
         println!("Problem parsing arguments: {err}!");
-        println!("{}", Args::help());
         process::exit(1);
     });
 

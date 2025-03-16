@@ -6,9 +6,11 @@ authors = [
     "AWTK Develop Team",
     "Shen ZhaoKun <shenzhaokun@zlg.cn>",
 ]
+description = "基于 rust-bindgen 的 AWTK 代码生成器"
 
 [dependencies]
 bindgen = "0.71.1"
+clap = { version = "4.5.32", features = ["derive"] }
 json = "0.12.4"
 pyo3 = { version = "0.23.5", features = ["auto-initialize"] }  # 启用自动初始化
 heck = "0.5.0"

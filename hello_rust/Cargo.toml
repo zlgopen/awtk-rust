@@ -6,5 +6,6 @@ authors = [
     "AWTK Develop Team",
     "Shen ZhaoKun <shenzhaokun@zlg.cn>",
 ]
+description = "AWTK Rust 示例代码"
 
 [dependencies]
