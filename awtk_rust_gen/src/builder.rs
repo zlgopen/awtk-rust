@@ -1,10 +1,9 @@
 use crate::{args::Args, idl::Idl};
 use pyo3::{
-    ffi::c_str,
     marker::Python,
     types::{PyAnyMethods, PyModule},
 };
-use std::{error::Error, ffi::CString, fs};
+use std::{error::Error, ffi::CString, fs, path};
 
 struct PythonInfo {
     cpp_path: Vec<String>,
@@ -14,6 +13,10 @@ struct PythonInfo {
 impl PythonInfo {
     fn parse(file_path: &str) -> Result<PythonInfo, Box<dyn Error>> {
         Python::with_gil(|py| {
+            let filename = path::Path::new(file_path)
+                .file_stem()
+                .and_then(|s| s.to_str())
+                .ok_or("Fail to get name by file path")?;
             let parent_dir = std::path::Path::new(file_path)
                 .parent()
                 .ok_or("Invalid file path")?
@@ -31,7 +34,7 @@ impl PythonInfo {
                 py,
                 CString::new(code)?.as_c_str(),
                 CString::new(file_path)?.as_c_str(),
-                c_str!("awtk_config"),
+                CString::new(filename)?.as_c_str(),
             )?;
             let info = PythonInfo {
                 cpp_path: py_module.getattr("CPPPATH")?.extract()?,
