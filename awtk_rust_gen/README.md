@@ -27,7 +27,7 @@ cargo build
 ## 使用
 
 ```cmd
-cargo run -- -H <header file path 1> ... <header file path n> -i <idl file path> -p <python config file path> -o <output file path>
+cargo run -- -H <header file path>... -i <idl file path> -p <python config file path> -o <output file path>
 ```
 
 - `-H` 或 `--header`：头文件路径（可以包含多个）
