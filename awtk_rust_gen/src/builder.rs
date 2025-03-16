@@ -110,11 +110,7 @@ impl bindgen::callbacks::ParseCallbacks for BuilderParseConverter {
                 }
             } else {
                 let prefix = enum_name_real.trim_end_matches("_t").to_uppercase() + "_";
-                let sanitized = if original_variant_name.starts_with(&prefix) {
-                    &original_variant_name[prefix.len()..]
-                } else {
-                    original_variant_name
-                };
+                let sanitized = original_variant_name.trim_start_matches(&prefix);
                 variant_name = sanitized.into();
             }
         }
@@ -165,19 +161,17 @@ impl Builder {
 
     pub fn build(args: &Args, idl: &Idl) -> Result<(), Box<dyn Error>> {
         let mut b: Builder = Builder::new();
-        b.builder = idl
-            .classes
-            .iter()
-            .fold(b.builder, |bld, (class_name, class)| {
-                let bld = bld.allowlist_type(class_name);
-                class.methods.iter().fold(bld, |inner_bld, method| {
-                    inner_bld.allowlist_function(&method.name)
-                })
-            });
 
-        b.builder = idl.enums.iter().fold(b.builder, |bld, (enum_name, _enum)| {
-            bld.allowlist_type(enum_name)
-        });
+        for (class_name, class) in &idl.classes {
+            b.builder = b.builder.allowlist_type(class_name);
+            for method in &class.methods {
+                b.builder = b.builder.allowlist_function(&method.name);
+            }
+        }
+
+        for (enum_name, _enum) in &idl.enums {
+            b.builder = b.builder.allowlist_type(enum_name);
+        }
 
         b.builder
             /* 添加命名转换回调 */
