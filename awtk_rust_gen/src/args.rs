@@ -53,7 +53,7 @@ impl Args {
         args.py_config_path = Self::_convert_to_absolute_path(&args.py_config_path)?;
         args.out_path = Self::_convert_to_absolute_path(&args.out_path)?;
 
-        println!("{:#?}", args);
+        println!("{args:#?}");
 
         Ok(args)
     }
@@ -62,7 +62,7 @@ impl Args {
     fn _convert_to_absolute_path(path: &str) -> Result<String, Box<dyn Error>> {
         let ret = path::absolute(path)?
             .to_str()
-            .ok_or("Failed to convert to absolute path")?
+            .ok_or_else(|| format!("Failed to convert to absolute path: {path}"))?
             .into();
         Ok(ret)
     }

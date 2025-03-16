@@ -16,13 +16,13 @@ impl PythonInfo {
             let filename = path::Path::new(file_path)
                 .file_stem()
                 .and_then(|s| s.to_str())
-                .ok_or("Failed to get name by file path")?;
+                .ok_or_else(|| format!("Failed to extract filename from path: {file_path}"))?;
 
             let parent_dir = path::Path::new(file_path)
                 .parent()
-                .ok_or("Invalid file path")?
+                .ok_or_else(|| format!("Invalid file path: {file_path}"))?
                 .to_str()
-                .ok_or("Path conversion error")?;
+                .ok_or_else(|| format!("Path conversion error: {file_path}"))?;
 
             let current_dir = env::current_dir()?;
             env::set_current_dir(parent_dir)?;
@@ -47,23 +47,19 @@ impl PythonInfo {
 
             Ok::<PythonInfo, Box<dyn Error>>(info)
         })
-        .map_err(Into::into)
+        .map_err(|err| format!("Python config parsing failed: {err}").into())
     }
 
     fn gen_clang_args(py_config_path: &str) -> Result<Vec<String>, Box<dyn Error>> {
-        let mut ret: Vec<String> = Vec::new();
         let info = PythonInfo::parse(py_config_path)?;
+        let ret: Vec<String> = info
+            .cpp_path
+            .iter()
+            .map(|path| format!("-I{path}"))
+            .chain(info.cc_flags.split_whitespace().map(ToString::to_string))
+            .collect();
 
-        info.cpp_path.iter().for_each(|cpp_path: &String| {
-            ret.push("-I".to_string() + cpp_path);
-        });
-
-        let cc_flags: Vec<&str> = info.cc_flags.split_whitespace().collect();
-        cc_flags.iter().for_each(|flag: &&str| {
-            ret.push(flag.to_string());
-        });
-
-        println!("clang args: {:?}", ret);
+        println!("clang args: {ret:?}");
 
         Ok(ret)
     }
@@ -122,7 +118,7 @@ impl bindgen::callbacks::ParseCallbacks for BuilderParseConverter {
         if variant_name
             .chars()
             .next()
-            .map_or(false, |c| c.is_ascii_digit())
+            .is_some_and(|c| c.is_ascii_digit())
         {
             variant_name = format!("_{variant_name}");
         }
@@ -162,16 +158,22 @@ impl Builder {
     pub fn build(args: &Args, idl: &Idl) -> Result<(), Box<dyn Error>> {
         let mut b: Builder = Builder::new();
 
-        for (class_name, class) in &idl.classes {
-            b.builder = b.builder.allowlist_type(class_name);
-            for method in &class.methods {
-                b.builder = b.builder.allowlist_function(&method.name);
-            }
-        }
+        b.builder = idl
+            .classes
+            .iter()
+            .fold(b.builder, |b, (class_name, class)| {
+                class
+                    .methods
+                    .iter()
+                    .fold(b.allowlist_type(class_name), |inner_b, method| {
+                        inner_b.allowlist_function(&method.name)
+                    })
+            });
 
-        for (enum_name, _enum) in &idl.enums {
-            b.builder = b.builder.allowlist_type(enum_name);
-        }
+        b.builder = idl
+            .enums
+            .keys()
+            .fold(b.builder, bindgen::Builder::allowlist_type);
 
         b.builder
             /* 添加命名转换回调 */
