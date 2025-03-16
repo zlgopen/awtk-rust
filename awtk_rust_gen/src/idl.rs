@@ -60,10 +60,8 @@ impl Idl {
     }
 
     pub fn parse(idl: &str) -> Result<Self, Box<dyn Error>> {
-        let mut result = Idl::new();
         let items: Vec<serde_json::Value> = serde_json::from_str(idl)?;
-
-        for item in items {
+        items.into_iter().try_fold(Idl::new(), |mut result, item| {
             if let Some(type_) = item.get("type").and_then(|v| v.as_str()) {
                 match type_ {
                     "class" => {
@@ -77,8 +75,7 @@ impl Idl {
                     _ => {}
                 }
             }
-        }
-
-        Ok(result)
+            Ok(result)
+        })
     }
 }
