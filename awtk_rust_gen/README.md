@@ -27,10 +27,10 @@ cargo build
 ## 使用
 
 ```cmd
-cargo run -- -h <header file path> -i <idl file path> -p <python config file path> -o <output file path>
+cargo run -- -h <header file path 1> ... <header file path n> -i <idl file path> -p <python config file path> -o <output file path>
 ```
 
-- `-h` 或 `--header`：头文件路径
+- `-h` 或 `--header`：头文件路径（可以包含多个）
 - `-i` 或 `--idl` ：idl 文件路径
 - `-p` 或 `--py` ：python 配置文件路径
 - `-o` 或 `--output`：输出文件路径

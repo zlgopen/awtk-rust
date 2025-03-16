@@ -170,7 +170,7 @@ impl Builder {
         b.builder
             /* 添加命名转换回调 */
             .parse_callbacks(Box::new(BuilderParseConverter { idl: idl.clone() }))
-            .header(&args.header_path)
+            .headers(&args.header_paths)
             .clang_args(PythonInfo::gen_clang_args(&args.py_config_path)?)
             .generate()?
             .write_to_file(&args.out_path)?;
