@@ -1,4 +1,4 @@
-use crate::{args::Args, idl::Idl};
+﻿use crate::{args::Args, idl::Idl};
 use pyo3::{
     marker::Python,
     types::{PyAnyMethods, PyModule},
@@ -11,7 +11,7 @@ struct PythonInfo {
 }
 
 impl PythonInfo {
-    fn parse(file_path: &str) -> Result<PythonInfo, Box<dyn Error>> {
+    fn parse(file_path: &str) -> Result<Self, Box<dyn Error>> {
         Python::with_gil(|py| {
             let filename = path::Path::new(file_path)
                 .file_stem()
@@ -135,7 +135,7 @@ pub struct Builder {
 }
 
 impl Builder {
-    fn new() -> Builder {
+    fn new() -> Self {
         Builder {
             builder: bindgen::Builder::default()
                 /* 白名单递归匹配所有关联类型 */

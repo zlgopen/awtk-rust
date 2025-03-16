@@ -1,4 +1,4 @@
-use std::{collections::HashMap, error::Error};
+﻿use std::{collections::HashMap, error::Error};
 
 #[derive(Default, Debug, Clone)]
 pub struct IdlMethodAnnotation {
@@ -37,13 +37,13 @@ pub struct Idl {
 }
 
 impl Idl {
-    fn new() -> Idl {
+    fn new() -> Self {
         Idl {
             ..Default::default()
         }
     }
 
-    pub fn parse(idl: &str) -> Result<Idl, Box<dyn Error>> {
+    pub fn parse(idl: &str) -> Result<Self, Box<dyn Error>> {
         let mut result: Idl = Idl::new();
         let parsed = json::parse(idl)?;
 
