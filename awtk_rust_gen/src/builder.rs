@@ -3,7 +3,7 @@ use pyo3::{
     marker::Python,
     types::{PyAnyMethods, PyModule},
 };
-use std::{error::Error, ffi::CString, fs, path};
+use std::{env, error::Error, ffi::CString, fs, path};
 
 struct PythonInfo {
     cpp_path: Vec<String>,
@@ -16,14 +16,16 @@ impl PythonInfo {
             let filename = path::Path::new(file_path)
                 .file_stem()
                 .and_then(|s| s.to_str())
-                .ok_or("Fail to get name by file path")?;
-            let parent_dir = std::path::Path::new(file_path)
+                .ok_or("Failed to get name by file path")?;
+
+            let parent_dir = path::Path::new(file_path)
                 .parent()
                 .ok_or("Invalid file path")?
                 .to_str()
                 .ok_or("Path conversion error")?;
-            let current_dir = std::env::current_dir()?;
-            std::env::set_current_dir(parent_dir)?;
+
+            let current_dir = env::current_dir()?;
+            env::set_current_dir(parent_dir)?;
 
             py.import("sys")?
                 .getattr("path")?
@@ -41,7 +43,7 @@ impl PythonInfo {
                 cc_flags: py_module.getattr("CCFLAGS")?.extract()?,
             };
 
-            std::env::set_current_dir(current_dir)?;
+            env::set_current_dir(current_dir)?;
 
             Ok::<PythonInfo, Box<dyn Error>>(info)
         })

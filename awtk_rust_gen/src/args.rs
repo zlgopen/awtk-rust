@@ -23,6 +23,15 @@ impl Args {
         }
     }
 
+    #[inline]
+    fn _convert_to_absolute_path(path: &str) -> Result<String, Box<dyn Error>> {
+        let ret = path::absolute(path)?
+            .to_str()
+            .ok_or("Failed to convert to absolute path")?
+            .into();
+        Ok(ret)
+    }
+
     pub fn parse() -> Result<Args, Box<dyn Error>> {
         let mut args = env::args();
         let mut result = Args::new();
@@ -44,26 +53,26 @@ impl Args {
                 }
                 _ => match state {
                     ArgsState::Header => {
-                        let path = path::absolute(arg)?.to_str().unwrap().into();
+                        let path = Args::_convert_to_absolute_path(&arg)?;
                         result.header_paths.push(path);
                     }
                     ArgsState::Idl => {
                         if !result.idl_path.is_empty() {
                             return Err("Got multiple idl file path!".into());
                         }
-                        result.idl_path = path::absolute(arg)?.to_str().unwrap().into();
+                        result.idl_path = Args::_convert_to_absolute_path(&arg)?;
                     }
                     ArgsState::Py => {
                         if !result.py_config_path.is_empty() {
                             return Err("Got multiple py config file path!".into());
                         }
-                        result.py_config_path = path::absolute(arg)?.to_str().unwrap().into();
+                        result.py_config_path = Args::_convert_to_absolute_path(&arg)?;
                     }
                     ArgsState::Out => {
                         if !result.out_path.is_empty() {
                             return Err("Got multiple out file path!".into());
                         }
-                        result.out_path = path::absolute(arg)?.to_str().unwrap().into();
+                        result.out_path = Args::_convert_to_absolute_path(&arg)?;
                     }
                     _ => {
                         continue;
