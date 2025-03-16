@@ -34,6 +34,8 @@ cargo run -- -H <header file path 1> ... <header file path n> -i <idl file path>
 - `-i` 或 `--idl` ：idl 文件路径
 - `-p` 或 `--py` ：python 配置文件路径
 - `-o` 或 `--output`：输出文件路径
+- `-h` 或 `--help`：打印帮助
+- `-V` 或 `--version`：打印版本
 
 ### 示例
 
