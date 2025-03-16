@@ -92,18 +92,21 @@ impl bindgen::callbacks::ParseCallbacks for BuilderParseConverter {
         original_variant_name: &str,
         _variant_value: bindgen::callbacks::EnumVariantValue,
     ) -> Option<String> {
-        /* 将枚举名转为大驼峰命名 */
+        let mut disable_pascal_case = false;
+        let mut variant_name = original_variant_name.to_string();
         if let Some(mut enum_name_real) = enum_name {
             enum_name_real = enum_name_real
                 .trim_start_matches("enum ")
                 .trim_start_matches('_');
 
-            let mut name_opt: Option<String> = None;
+            /* 这些类型与大小写有关系，就不转成大驼峰命名了 */
+            disable_pascal_case = ["key_code_t"].iter().any(|&s| s == enum_name_real);
 
+            /* 去掉枚举名前缀 */
             if let Some(enum_) = self.idl.enums.get(enum_name_real) {
                 if !enum_.prefix.is_empty() {
                     let sanitized = original_variant_name.trim_start_matches(&enum_.prefix);
-                    name_opt = Some(heck::ToPascalCase::to_pascal_case(sanitized));
+                    variant_name = sanitized.into();
                 }
             } else {
                 let prefix = enum_name_real.trim_end_matches("_t").to_uppercase() + "_";
@@ -112,18 +115,22 @@ impl bindgen::callbacks::ParseCallbacks for BuilderParseConverter {
                 } else {
                     original_variant_name
                 };
-                name_opt = Some(heck::ToPascalCase::to_pascal_case(sanitized));
-            }
-
-            if let Some(mut name) = name_opt {
-                /* 以数字开头时，前面加下划线 */
-                if name.chars().next().map_or(false, |c| c.is_ascii_digit()) {
-                    name = format!("_{name}");
-                }
-                return Some(name);
+                variant_name = sanitized.into();
             }
         }
-        Some(heck::ToPascalCase::to_pascal_case(original_variant_name))
+        if !disable_pascal_case {
+            /* 将枚举名转为大驼峰命名 */
+            variant_name = heck::ToPascalCase::to_pascal_case(variant_name.as_str());
+        }
+        /* 以数字开头时，前面加下划线 */
+        if variant_name
+            .chars()
+            .next()
+            .map_or(false, |c| c.is_ascii_digit())
+        {
+            variant_name = format!("_{variant_name}");
+        }
+        Some(variant_name)
     }
 }
 
