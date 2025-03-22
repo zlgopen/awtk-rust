@@ -51,11 +51,11 @@ impl PythonInfo {
     }
 
     fn gen_clang_args(py_config_path: &str) -> Result<Vec<String>, Box<dyn Error>> {
-        let info = PythonInfo::parse(py_config_path)?;
+        let info = Self::parse(py_config_path)?;
         let ret: Vec<String> = info
             .cpp_path
             .iter()
-            .map(|path| format!("-I{path}"))
+            .map(|path| format!("-I{}", path.as_str()))
             .chain(info.cc_flags.split_whitespace().map(ToString::to_string))
             .collect();
 
@@ -101,12 +101,12 @@ impl bindgen::callbacks::ParseCallbacks for BuilderParseConverter {
             /* 去掉枚举名前缀 */
             if let Some(enum_) = self.idl.enums.get(enum_name_real) {
                 if !enum_.prefix.is_empty() {
-                    let sanitized = original_variant_name.trim_start_matches(&enum_.prefix);
+                    let sanitized = original_variant_name.trim_start_matches(enum_.prefix.as_str());
                     variant_name = sanitized.into();
                 }
             } else {
                 let prefix = enum_name_real.trim_end_matches("_t").to_uppercase() + "_";
-                let sanitized = original_variant_name.trim_start_matches(&prefix);
+                let sanitized = original_variant_name.trim_start_matches(prefix.as_str());
                 variant_name = sanitized.into();
             }
         }
@@ -156,7 +156,7 @@ impl Builder {
     }
 
     pub fn build(args: &Args, idl: &Idl) -> Result<(), Box<dyn Error>> {
-        let mut b = Builder::new();
+        let mut b = Self::new();
 
         b.builder = idl
             .classes
@@ -178,7 +178,7 @@ impl Builder {
         b.builder
             /* 添加命名转换回调 */
             .parse_callbacks(Box::new(BuilderParseConverter { idl: idl.clone() }))
-            .headers(&args.header_paths)
+            .headers(args.header_paths.iter().map(String::as_str))
             .clang_args(PythonInfo::gen_clang_args(&args.py_config_path)?)
             .generate()?
             .write_to_file(&args.out_path)?;

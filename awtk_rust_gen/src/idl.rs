@@ -53,29 +53,30 @@ pub struct Idl {
 }
 
 impl Idl {
-    fn new() -> Self {
-        Idl {
-            ..Default::default()
-        }
-    }
-
     pub fn parse(idl: &str) -> Result<Self, Box<dyn Error>> {
         let items: Vec<serde_json::Value> = serde_json::from_str(idl)?;
-        items.into_iter().try_fold(Idl::new(), |mut result, item| {
-            if let Some(type_) = item.get("type").and_then(|v| v.as_str()) {
-                match type_ {
-                    "class" => {
-                        let class: IdlClass = serde_json::from_value(item)?;
-                        result.classes.insert(class.name.clone(), class);
+        let capacity = items.len();
+        items.into_iter().try_fold(
+            Self {
+                classes: HashMap::with_capacity(capacity),
+                enums: HashMap::with_capacity(capacity),
+            },
+            |mut result, item| {
+                if let Some(type_) = item.get("type").and_then(|v| v.as_str()) {
+                    match type_ {
+                        "class" => {
+                            let class: IdlClass = serde_json::from_value(item)?;
+                            result.classes.insert(class.name.clone(), class);
+                        }
+                        "enum" => {
+                            let enum_: IdlEnum = serde_json::from_value(item)?;
+                            result.enums.insert(enum_.name.clone(), enum_);
+                        }
+                        _ => {}
                     }
-                    "enum" => {
-                        let enum_: IdlEnum = serde_json::from_value(item)?;
-                        result.enums.insert(enum_.name.clone(), enum_);
-                    }
-                    _ => {}
                 }
-            }
-            Ok(result)
-        })
+                Ok(result)
+            },
+        )
     }
 }
