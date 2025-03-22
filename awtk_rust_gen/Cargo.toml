@@ -7,6 +7,7 @@ authors = [
     "Shen ZhaoKun <shenzhaokun@zlg.cn>",
 ]
 description = "基于 rust-bindgen 的 AWTK 代码生成器"
+license = "LGPL-2.1"
 
 [dependencies]
 bindgen = "0.71.1"
